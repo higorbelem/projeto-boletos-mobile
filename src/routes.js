@@ -1,9 +1,18 @@
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator, createStackNavigator } from 'react-navigation';
+import {AsyncStorage} from 'react-native';
 
 import Main from '~/pages/Main';
 import Login from '~/pages/Login';
 import QrCodeReader from '~/pages/QrCodeReader';
+import SplashScreen from '~/pages/SplashScreen';
 
-const Routes = createAppContainer(createSwitchNavigator({ main: Main, login: Login , qrCodeReader: QrCodeReader}));
+function Routes(){
+   const stackNav = createStackNavigator({ main: Main, qrCodeReader: QrCodeReader});
+   const switchNav = createSwitchNavigator({splash: SplashScreen, login: Login , stack: stackNav},{initialRouteName: "splash"});
 
-export default Routes;
+   return(
+      createAppContainer(switchNav)
+   );
+}
+
+export default Routes();

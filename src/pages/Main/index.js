@@ -1,10 +1,22 @@
 import React, {Component} from 'react'
-import {Platform, UIManager, LayoutAnimation, View, Alert, Text, AsyncStorage, Image, Animated, Easing} from 'react-native'
+import {Platform, UIManager, LayoutAnimation, View, Alert, Text, AsyncStorage, Image, Animated, Easing, ScrollView} from 'react-native'
 import {TxtInputLogin, BtnLogin, BtnLoginText, Container, ContainerBusca, BtnAdvanSearch, BtnAdvanSearchImage, FloatingBtn, FloatingBtnImage} from './styles' 
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { accent1 } from '~/utils/Colors'
+import List from './components/List';
+//import AbortController from 'abort-controller'
+import 'abort-controller/polyfill'
+//import 'abortcontroller-polyfill'
+
+const AbortController = window.AbortController;
+const controller = new AbortController()
+const signal = controller.signal
  
 class Main extends Component{
+
+  static navigationOptions = {
+    header: null
+  }
 
   constructor(props) {
     super(props)
@@ -16,7 +28,8 @@ class Main extends Component{
       //height: new Animated.Value(0),
       //height: 0,
       isMaxHeight: false,
-      txtInputBuscaEditable: true
+      txtInputBuscaEditable: true,
+      items: []
     }
 
     if(Platform.OS === 'android'){
@@ -36,7 +49,17 @@ class Main extends Component{
     return (
       <Container>
         <ContainerBusca>
-          <TxtInputLogin editable={this.state.txtInputBuscaEditable} placeholder="BUSCAR"/>
+          <TxtInputLogin 
+            editable={this.state.txtInputBuscaEditable} 
+            placeholder="BUSCAR"
+            onChangeText={(text) => {
+              if(text !== ''){
+                //controller.abort()
+                this.buscarCasasSimples(text)
+              }else{
+                this.listCasas.updateItems([], this.state.medidor)
+              }
+            }}/>
           <BtnAdvanSearch onPress={this.btnAdvanSearchPress}>
             <BtnAdvanSearchImage source={require('~/resources/arrow_down.png')}/>
           </BtnAdvanSearch>
@@ -160,6 +183,12 @@ class Main extends Component{
 
         </Animated.View>
 
+        <ScrollView style={{width: '100%'}}>
+          <List style={{width: '100%'}} 
+            items={this.state.items} 
+            ref={(ref) => this.listCasas = ref}/>
+        </ScrollView>
+
         <FloatingBtn onPress={this.qrCodePress} style={{backgroundColor: accent1}}>
           <FloatingBtnImage source={require('~/resources/qr_code.png')}/>
         </FloatingBtn>
@@ -225,6 +254,34 @@ class Main extends Component{
     } catch (error) {
       // Error retrieving data
     }
+  }
+
+  buscarCasasSimples = async (busca) => {
+    //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
+    await fetch('http://ibarber.ga/projeto-boletos-server/buscarCasasSimples.php', {method: 'POST', body: JSON.stringify({'id-cedente': this.state.medidor.cedenteId, 'busca': busca})},{signal})
+    .then(res => {
+      return res.text()
+    })
+    .then(res => {
+      if(!res.includes("erro-login")){
+        object = JSON.parse(res);
+        /*Alert.alert('Error', object[0].id, [{
+          text: 'Ok'
+        }])*/
+        /*this.setState({
+          items: object
+        })*/
+        this.listCasas.updateItems(object, this.state.medidor)
+      }else{
+        this.listCasas.updateItems([], this.state.medidor)
+        //nada encontrado
+      }
+    })
+    .catch(erro =>{
+      Alert.alert('Error', 'Problem with the connection or server.' + erro, [{
+            text: 'Ok'
+      }])
+    })
   }
 
   interpolateValue(value, inputRange, outputRange){

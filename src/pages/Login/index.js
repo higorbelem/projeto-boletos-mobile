@@ -95,7 +95,6 @@ class Login extends Component{
         // Error saving data
       }
    }
-    
 }
 
 export default Login

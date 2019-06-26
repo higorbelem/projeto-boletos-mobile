@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PopupDialog, { SlideAnimation } from 'react-native-popup-dialog';
-import DialogManager, { ScaleAnimation, DialogContent, Dialog, DialogButton } from 'react-native-dialog-component';
+import DialogManager, { ScaleAnimation, DialogContent, Dialog, DialogButton, DialogComponent } from 'react-native-dialog-component';
 import { text1, text2, accent1 } from '~/utils/Colors'
-import {BtnEnviar, BtnEnviarText, TxtInputMedicao} from './styles'
+import {BtnEnviar, BtnEnviarText, TxtInputMedicao, BackBtn, BackBtnImage} from './styles'
  
 const slideAnimation = new SlideAnimation({
   slideFrom: 'bottom',
@@ -21,12 +21,16 @@ import {
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
+//{"id":"2","rua":"asdas","numero":"123","bairro":"adasd","cidade":"sadads","uf":"as","numHidrometro":"123123"}
+
 class QRCodeReader extends Component {
+
+   static navigationOptions = {
+      header: null
+   }
 
    constructor(props) {
       super(props)
-
-      this.medicaoField = React.createRef();
 
       this.state = {
          medidor: ''
@@ -37,12 +41,31 @@ class QRCodeReader extends Component {
 
    render() {
       return (
-         <QRCodeScanner
-            onRead={this.onSuccess}
-            checkAndroid6Permissions={true}
-            showMarker={true}
-            ref={(node) => { this.scanner = node }}
-         />
+         <View style={{width: '100%', height: '100%'}}>
+            <View style={{flex:1}}>
+               <QRCodeScanner
+                  onRead={this.onSuccess}
+                  checkAndroid6Permissions={true}
+                  showMarker={true}
+                  cameraStyle={{width: '100%', height: '100%'}}
+                  customMarker={
+                     <View style={{width: 300, height: 300, borderWidth: 2, borderColor: 'white'}}/>
+                  }
+                  ref={(node) => { this.scanner = node }}
+                  topContent={
+                     <View style={{backgroundColor: 'black', width:'100%', height:'100%'}}/>
+                  }
+                  bottomContent={
+                     <View style={{backgroundColor: 'black', width:'100%', height:'100%'}}/>
+                  }
+               />
+            </View>
+            <BackBtn onPress={() => {
+               this.props.navigation.goBack()
+            }}>
+               <BackBtnImage source={require('~/resources/arrow_back_white.png')}/>
+            </BackBtn>
+         </View>
       );
    }
 
@@ -53,119 +76,132 @@ class QRCodeReader extends Component {
          /*this.popupDialog.show(() => {
             console.log('callback - will be called immediately')
          });*/
-         object = JSON.parse(e.data);
 
-         DialogManager.show({
-            title: 'INFORMAÇÕES DA CASA',
-            titleAlign: 'center',
-            animationDuration: 200,
-            dialogAnimation: new SlideAnimation({ slideFrom: 'bottom' }),
-            children: (
-              <DialogContent>
-                <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                  <View 
-                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop:10
-                     }}
-                  >
-                     <Text style={{color: text1}}>
-                        ID
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.id}
-                     </Text>
-                  </View>
-                  <View 
-                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop:10
-                     }}
-                  >
-                     <Text style={{color: text1}}>
-                        RUA
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.rua}
-                     </Text>
+         try{
+            object = JSON.parse(e.data);
 
-                     <Text style={{color: text1, marginLeft: 20}}>
-                        NUMERO
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.numero}
-                     </Text>
-                  </View>
-                  <View 
-                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop:10
-                     }}
-                  >
-                     <Text style={{color: text1}}>
-                        BAIRRO
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.bairro}
-                     </Text>
-
-                     <Text style={{color: text1, marginLeft: 20}}>
-                        CIDADE
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.cidade}
-                     </Text>
-                  </View>
-                  <View 
-                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop:10
-                     }}
-                  >
-                     <Text style={{color: text1}}>
-                        UF
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.uf}
-                     </Text>
-
-                     <Text style={{color: text1, marginLeft: 20}}>
-                        NÚMERO DO HIDRÔMETRO
-                     </Text>
-                     <Text style={{color: text2, marginLeft: 10}}>
-                        {object.numHidrometro}
-                     </Text>
-                  </View>
-
-                  <TxtInputMedicao 
-                     style={{marginTop: 10}} 
-                     placeholder="VALOR DA MEDIÇÃO"
-                     ref={this.medicaoField} 
-                  />
-
-                  <BtnEnviar onPress={this.btnEnviarPress(object)} style={{backgroundColor: accent1, marginTop: 10}}>
-                     <BtnEnviarText>
-                        ENVIAR
-                     </BtnEnviarText>
-                  </BtnEnviar>
-
-                </View>
-              </DialogContent>
-            ),
-            onDismissed:() => {
-               this.scanner.reactivate() 
-            }
-          }, () => {
-            //console.warn('callback - show');
-          });
+            DialogManager.show({
+               title: 'INFORMAÇÕES DA CASA',
+               titleAlign: 'center',
+               animationDuration: 200,
+               dialogAnimation: new SlideAnimation({ slideFrom: 'bottom' }),
+               children: (
+                  <DialogContent>
+                     <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                        <View 
+                           style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop:10
+                           }}
+                        >
+                           <Text style={{color: text1}}>
+                              ID
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.id}
+                           </Text>
+                        </View>
+                        <View 
+                           style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop:10
+                           }}
+                        >
+                           <Text style={{color: text1}}>
+                              RUA
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.rua}
+                           </Text>
+   
+                           <Text style={{color: text1, marginLeft: 20}}>
+                              NUMERO
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.numero}
+                           </Text>
+                        </View>
+                        <View 
+                           style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop:10
+                           }}
+                        >
+                           <Text style={{color: text1}}>
+                              BAIRRO
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.bairro}
+                           </Text>
+   
+                           <Text style={{color: text1, marginLeft: 20}}>
+                              CIDADE
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.cidade}
+                           </Text>
+                        </View>
+                        <View 
+                           style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop:10
+                           }}
+                        >
+                           <Text style={{color: text1}}>
+                              UF
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.uf}
+                           </Text>
+   
+                           <Text style={{color: text1, marginLeft: 20}}>
+                              NUMERO. HIDRÔMETRO
+                           </Text>
+                           <Text style={{color: text2, marginLeft: 10}}>
+                              {object.numHidrometro}
+                           </Text>
+                        </View>
+   
+                        <TxtInputMedicao 
+                           style={{marginTop: 10}} 
+                           placeholder="VALOR DA MEDIÇÃO"
+                           ref={(ref) => this.medicaoField = ref}
+                           keyboardType="numeric"
+                           type={'number'}
+                        />
+   
+                        <BtnEnviar onPress={() => {this.btnEnviarPress(object)}} style={{backgroundColor: accent1, marginTop: 10}}>
+                           <BtnEnviarText>
+                              ENVIAR
+                           </BtnEnviarText>
+                        </BtnEnviar>
+   
+                     </View>
+                  </DialogContent>
+               ),
+               onDismissed:() => {
+                  this.scanner.reactivate() 
+               }
+            }, () => {
+               //console.warn('callback - show');
+            });
+         }catch(erro){
+            Alert.alert('', "Qr-Code inválido", [{
+               text: 'Ok',
+               onPress: () => {
+                  this.scanner.reactivate()  
+               }
+            }])
+         }
+         
       }else{
          this.scanner.reactivate()  
       }
@@ -181,16 +217,21 @@ class QRCodeReader extends Component {
           })
         }
       } catch (error) {
-        // Error retrieving data
+         
       }
    }
 
    btnEnviarPress = (object) => {
-      console.warn(object.id)
-      /*const medicao = this.medicaoField.current.value
-      if(senha !== '' && senha !== undefined){
+      //console.warn(object.id)
+      const medicao = this.medicaoField._lastNativeText;
+      if(medicao !== '' && medicao !== undefined){
+         //console.warn(medicao)
          this.gerarMedicao(object.id, medicao)
-      }*/
+      }else{
+         Alert.alert('', "Campo vazio", [{
+            text: 'Ok'
+         }])
+      }
    }
 
    gerarMedicao = (casaId, medicao) => {
@@ -200,15 +241,25 @@ class QRCodeReader extends Component {
          return res.text()
       })
       .then(res => {
-         if(!res.includes("erro-login")){
-            Alert.alert('', "asdadadasd", [{
-               text: 'Ok'
-            }])
-         }else{
+         if(res.includes("erro-login")){
             Alert.alert('', "Algo deu errado, tente novamente.", [{
                text: 'Ok'
             }])
             this.scanner.reactivate()  
+         }else if(res.includes("medicao-menor")){
+            Alert.alert('', "Medição dada é menor que a ultima medição da casa.", [{
+               text: 'Ok'
+            }])
+            this.scanner.reactivate()  
+         }else{
+            Alert.alert('', "Medição enviada com sucesso", [{
+               text: 'Ok',
+               onPress: () => {
+                  DialogManager.dismissAll(() => {
+
+                  });
+               }
+            }])
          }
       })
       .catch(erro =>{
