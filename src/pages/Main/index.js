@@ -7,6 +7,8 @@ import List from './components/List';
 //import AbortController from 'abort-controller'
 import 'abort-controller/polyfill'
 //import 'abortcontroller-polyfill'
+import { ServerUrl } from '~/utils/server'
+import ApiUtils from '~/utils/ApiUtils'
 
 const AbortController = window.AbortController;
 const controller = new AbortController()
@@ -374,7 +376,8 @@ class Main extends Component{
 
   buscarCasasSimples = async (busca) => {
     //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
-    await fetch('http://ibarber.ga/projeto-boletos-server/buscarCasasSimples.php', {method: 'POST', body: JSON.stringify({'id-cedente': this.state.medidor.cedenteId, 'busca': busca})},{signal})
+    await fetch(ServerUrl + '/projeto-boletos-server/buscarCasasSimples.php', {method: 'POST', body: JSON.stringify({'id-cedente': this.state.medidor.cedenteId, 'busca': busca})},{signal})
+    .then(ApiUtils.checkStatus)
     .then(res => {
       return res.text()
     })
@@ -400,7 +403,7 @@ class Main extends Component{
       }
     })
     .catch(erro =>{
-      Alert.alert('Error', 'Problem with the connection or server.' + erro, [{
+      Alert.alert('Error', 'Problemas com o servidor  ou sua conexão com a internet.', [{
             text: 'Ok'
       }])
       this.setState({
@@ -411,7 +414,7 @@ class Main extends Component{
 
   buscarCasasAvancado = async (rua, numero, bairro, cidade, uf, cep) => {
     //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
-    await fetch('http://ibarber.ga/projeto-boletos-server/buscarCasasAvancado.php', 
+    await fetch(ServerUrl + '/projeto-boletos-server/buscarCasasAvancado.php', 
       {method: 'POST', body: JSON.stringify({
         'id-cedente': this.state.medidor.cedenteId,
         'rua': rua,
@@ -421,7 +424,9 @@ class Main extends Component{
         'uf': uf,
         'cep': cep
       })},
-      {signal})
+      {signal}
+    )
+    .then(ApiUtils.checkStatus)  
     .then(res => {
       return res.text()
     })
@@ -444,7 +449,7 @@ class Main extends Component{
       }
     })
     .catch(erro =>{
-      Alert.alert('Error', 'Problem with the connection or server.' + erro, [{
+      Alert.alert('Error', 'Problemas com o servidor  ou sua conexão com a internet.', [{
             text: 'Ok'
       }])
       this.setState({

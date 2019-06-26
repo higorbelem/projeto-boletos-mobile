@@ -9,6 +9,8 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import { TextInputMask } from 'react-native-masked-text'
 import { accent1 } from '~/utils/Colors'
+import { ServerUrl } from '~/utils/server'
+import ApiUtils from '~/utils/ApiUtils'
  
 class Login extends Component{
 
@@ -101,7 +103,8 @@ class Login extends Component{
                loading: true
             })
             this.buttonClicked = true
-            fetch('http://ibarber.ga/projeto-boletos-server/getMedidor.php',{method: 'POST', body: JSON.stringify({cpf: cpf, senha: senha})})
+            fetch(ServerUrl + '/projeto-boletos-server/getMedidor.php',{method: 'POST', body: JSON.stringify({cpf: cpf, senha: senha})})
+            .then(ApiUtils.checkStatus)
             .then(res => {
                return res.text()
             })
@@ -126,7 +129,7 @@ class Login extends Component{
             })
             .catch(erro =>{
                this.buttonClicked = false
-               Alert.alert('Error', 'Problem with the connection or server.' + erro, [{
+               Alert.alert('Erro', 'Problemas com o servidor  ou sua conexão com a internet.', [{
                      text: 'Ok'
                }])
                this.setState({
