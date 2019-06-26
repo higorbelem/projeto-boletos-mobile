@@ -16,7 +16,7 @@ export const BtnEnviarText = styled.Text`
 `;
 
 export const TxtInputMedicao = styled.TextInput`
-   width: 40%;
+   width: 80%;
    height: 50px;
    align-items: center;
    text-align: center;

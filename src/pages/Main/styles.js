@@ -69,3 +69,13 @@ export const FloatingBtnImage = styled.Image`
    width: 50%;
    height: 50%;
 `;
+
+export const BtnSair = styled.TouchableOpacity`
+   position: absolute;
+   height: 100%;
+   align-items: center;
+   justify-content: center;
+   right: 0;
+   padding-left: 20px;
+   padding-right: 20px;
+`;

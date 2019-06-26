@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {View, Text, AsyncStorage} from 'react-native'
+import {View, Text, AsyncStorage, Image} from 'react-native'
  
 class SplashScreen extends Component{
 
@@ -20,9 +20,16 @@ class SplashScreen extends Component{
 
    render() {
       return (
-         <View>
-            <Text style={{width: '100%', height: '100%', textAlign: 'center', fontSize: 20}}>SplashScreen</Text>
-         </View>
+         <Image source={require('~/resources/bg_login.png')} 
+            style={{
+               position: 'absolute',
+               left: 0,
+               top: 0,
+               width: '100%',
+               height: '100%'
+            }}
+            resizeMode='stretch'
+         /> 
       )
    }
 

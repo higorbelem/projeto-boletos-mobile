@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import {Platform, UIManager, LayoutAnimation, View, Alert, Text, AsyncStorage, Image, Animated, Easing, ScrollView} from 'react-native'
-import {TxtInputLogin, BtnLogin, BtnLoginText, Container, ContainerBusca, BtnAdvanSearch, BtnAdvanSearchImage, FloatingBtn, FloatingBtnImage} from './styles' 
+import {Platform, UIManager, LayoutAnimation, View, Alert, Text, Dimensions, ActivityIndicator, AsyncStorage, Image, Animated, Easing, ScrollView} from 'react-native'
+import {TxtInputLogin, BtnLogin, BtnLoginText, Container, ContainerBusca, BtnAdvanSearch, BtnAdvanSearchImage, FloatingBtn, FloatingBtnImage, BtnSair} from './styles' 
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { accent1 } from '~/utils/Colors'
 import List from './components/List';
@@ -25,11 +25,19 @@ class Main extends Component{
 
     this.state = {
       medidor: '',
+      ruaInput: '',
+      numeroInput: '',
+      bairroInput: '',
+      cidadeInput: '',
+      ufInput: '',
+      cepInput: '',
       //height: new Animated.Value(0),
       //height: 0,
       isMaxHeight: false,
       txtInputBuscaEditable: true,
-      items: []
+      items: [],
+      loading: false,
+      currentArrowImage: require('~/resources/arrow_down.png') 
     }
 
     if(Platform.OS === 'android'){
@@ -48,6 +56,51 @@ class Main extends Component{
 
     return (
       <Container>
+
+        <View style={{
+            width: '100%',
+            height: 40,
+            backgroundColor: '#00000080',
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}>
+
+          <Text style={{
+              position: 'absolute',
+              left: 10,
+              color: '#FFFFFFCC',
+              fontWeight: 'bold',
+              fontSize: 15
+            }}>
+              {
+                this.state.medidor.nome
+              }
+          </Text>
+
+          <BtnSair onPress={() => {
+            Alert.alert('', "Deseja sair?", [
+              {
+                text: 'Sim',
+                onPress: () => {
+                  this.storeData('').then(() =>{
+                    this.props.navigation.navigate('login')
+                  })
+                }
+              },
+              {
+                text: 'Não'
+              }
+            ])
+          }}>
+              <Text style={{
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: 15
+              }}>SAIR</Text>
+          </BtnSair>
+
+        </View>
+
         <ContainerBusca>
           <TxtInputLogin 
             editable={this.state.txtInputBuscaEditable} 
@@ -55,25 +108,31 @@ class Main extends Component{
             onChangeText={(text) => {
               if(text !== ''){
                 //controller.abort()
+                this.setState({
+                  loading: true
+                })
+                //this.forceUpdate();
                 this.buscarCasasSimples(text)
               }else{
                 this.listCasas.updateItems([], this.state.medidor)
               }
             }}/>
           <BtnAdvanSearch onPress={this.btnAdvanSearchPress}>
-            <BtnAdvanSearchImage source={require('~/resources/arrow_down.png')}/>
+            <BtnAdvanSearchImage source={this.state.currentArrowImage}/>
           </BtnAdvanSearch>
         </ContainerBusca>
 
-        <Animated.View style={{
-          height: `${this.height}%`,
-          opacity: this.interpolateValue(this.height,[0,50],[0,1]),
-          width: '100%',
-          flexDirection: 'column',
-          backgroundColor: '#00000005',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}>
+        <Animated.View 
+          style={{
+            height: `${this.height}%`,
+            //opacity: this.interpolateValue(this.height,[0,50],[0,1]),
+            opacity: this.interpolateValue(this.height,[0,50],[0,1]),
+            width: '100%',
+            flexDirection: 'column',
+            backgroundColor: '#00000005',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
 
           <View style={{
               flex: 1,
@@ -93,6 +152,7 @@ class Main extends Component{
                 borderRadius: 40
               }}
               placeholder="RUA"
+              onChangeText={(field) => this.setState({ruaInput: field})}
             />
             <TextInput 
               style={{
@@ -106,6 +166,7 @@ class Main extends Component{
                 marginLeft: 5
               }}
               placeholder="Nº"
+              onChangeText={(field) => this.setState({numeroInput: field})}
             />
           </View>
 
@@ -127,6 +188,7 @@ class Main extends Component{
                 borderRadius: 40
               }}
               placeholder="BAIRRO"
+              onChangeText={(field) => this.setState({bairroInput: field})}
             />
             <TextInput 
               style={{
@@ -140,6 +202,7 @@ class Main extends Component{
                 marginLeft: 5
               }}
               placeholder="CIDADE"
+              onChangeText={(field) => this.setState({cidadeInput: field})}
             />
           </View>
 
@@ -161,6 +224,7 @@ class Main extends Component{
                 borderRadius: 40
               }}
               placeholder="UF"
+              onChangeText={(field) => this.setState({ufInput: field})}
             />
             <TextInput 
               style={{
@@ -174,6 +238,7 @@ class Main extends Component{
                 marginLeft: 5
               }}
               placeholder="CEP"
+              onChangeText={(field) => this.setState({cepInput: field})}
             />
           </View>
 
@@ -193,14 +258,56 @@ class Main extends Component{
           <FloatingBtnImage source={require('~/resources/qr_code.png')}/>
         </FloatingBtn>
 
+        { 
+          this.state.loading ?
+            <ActivityIndicator 
+              size="120%" 
+              color={accent1} 
+              style={{
+                marginTop: ((Dimensions.get('window').height/100)*this.height) + 140,
+                position: 'absolute',
+                backgroundColor: 'white',
+                borderRadius: 40,
+                borderWidth: 3,
+                borderColor: 'white'
+              }}
+            /> 
+          : 
+            <View/>
+        }
+
       </Container>
     )
   }
 
   buscarPress = () => {
-    Alert.alert('', 'BUSCAR', [{
-      text: 'Ok'
-    }])
+    const rua = this.state.ruaInput;
+    const numero = this.state.numeroInput;
+    const bairro = this.state.bairroInput;
+    const cidade = this.state.cidadeInput;
+    const uf = this.state.ufInput;
+    const cep = this.state.cepInput;
+
+    //console.warn(rua + ", " + numero + ", " + bairro + ", " + cidade + ", " + uf + ", " + cep)
+
+    if(rua != '' ||
+    numero != '' ||
+    bairro != '' ||
+    cidade != '' ||
+    uf != '' ||
+    cep != ''){
+
+      this.btnAdvanSearchPress()
+      this.setState({
+        loading: true
+      })
+      this.buscarCasasAvancado(rua, numero, bairro, cidade, uf, cep)
+
+    }else{
+      Alert.alert('', 'Preencha pelo menos um campo.', [{
+        text: 'Ok'
+      }])
+    }
   }
 
   qrCodePress = () => {
@@ -208,6 +315,15 @@ class Main extends Component{
   }
 
   btnAdvanSearchPress = () => {
+    if(this.state.isMaxHeight){
+      this.setState({
+        currentArrowImage: require('~/resources/arrow_down.png') 
+      });
+    }else{
+      this.setState({
+        currentArrowImage: require('~/resources/arrow_up.png') 
+      });
+    }
     this.toggleWidth();
   }
 
@@ -272,8 +388,14 @@ class Main extends Component{
           items: object
         })*/
         this.listCasas.updateItems(object, this.state.medidor)
+        this.setState({
+          loading: false
+        })
       }else{
         this.listCasas.updateItems([], this.state.medidor)
+        this.setState({
+          loading: false
+        })
         //nada encontrado
       }
     })
@@ -281,7 +403,63 @@ class Main extends Component{
       Alert.alert('Error', 'Problem with the connection or server.' + erro, [{
             text: 'Ok'
       }])
+      this.setState({
+        loading: false
+      })
     })
+  }
+
+  buscarCasasAvancado = async (rua, numero, bairro, cidade, uf, cep) => {
+    //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
+    await fetch('http://ibarber.ga/projeto-boletos-server/buscarCasasAvancado.php', 
+      {method: 'POST', body: JSON.stringify({
+        'id-cedente': this.state.medidor.cedenteId,
+        'rua': rua,
+        'numero': numero,
+        'bairro': bairro,
+        'cidade': cidade,
+        'uf': uf,
+        'cep': cep
+      })},
+      {signal})
+    .then(res => {
+      return res.text()
+    })
+    .then(res => {
+      /*Alert.alert('Error', res, [{
+        text: 'Ok'
+      }])*/
+      if(!res.includes("erro-login")){
+        object = JSON.parse(res);
+        this.listCasas.updateItems(object, this.state.medidor)
+        this.setState({
+          loading: false
+        })
+      }else{
+        this.listCasas.updateItems([], this.state.medidor)
+        this.setState({
+          loading: false
+        })
+        //nada encontrado
+      }
+    })
+    .catch(erro =>{
+      Alert.alert('Error', 'Problem with the connection or server.' + erro, [{
+            text: 'Ok'
+      }])
+      this.setState({
+        loading: false
+      })
+    })
+  }
+
+  storeData = async (medidorJson) => {
+    try {
+      await AsyncStorage.setItem("medidor", medidorJson);
+    } catch (error) {
+      console.warn(error)
+      // Error saving data
+    }
   }
 
   interpolateValue(value, inputRange, outputRange){
