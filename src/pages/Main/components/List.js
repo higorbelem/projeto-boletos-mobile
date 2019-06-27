@@ -4,6 +4,8 @@ import { text1, text2, accent1 } from '~/utils/Colors'
 import DialogManager, { DialogContent } from 'react-native-dialog-component';
 import { SlideAnimation } from 'react-native-popup-dialog';
 import {TxtInputMedicao, BtnEnviar, BtnEnviarText} from '~/pages/QrCodeReader/styles'
+import { ServerUrl } from '~/utils/server'
+import ApiUtils from '~/utils/ApiUtils'
    
 class List extends Component {
 
@@ -14,7 +16,8 @@ class List extends Component {
 
       this.state = {
          items: props.items,
-         medidor: ''
+         medidor: '',
+         medicao:''
       }
    }
 
@@ -27,7 +30,7 @@ class List extends Component {
    
    btnEnviarPress = (object) => {
       //console.warn(object.id)
-      const medicao = this.medicaoField._lastNativeText;
+      const medicao = this.state.medicao;
       if(medicao !== '' && medicao !== undefined){
          //console.warn(medicao)
          this.gerarMedicao(object.id, medicao)
@@ -41,20 +44,13 @@ class List extends Component {
    gerarMedicao = (casaId, medicao) => {
       //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao}))
       
-      fetch('http://ibarber.ga/projeto-boletos-server/gerarMedicao.php',{method: 'POST', body: JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao})})
+      fetch(ServerUrl + '/projeto-boletos-server/gerarMedicao.php',{method: 'POST', body: JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao})})
+      .then(ApiUtils.checkStatus)
       .then(res => {
          return res.text()
       })
       .then(res => {
-         if(res.includes("erro-login")){
-            Alert.alert('', "Algo deu errado, tente novamente.", [{
-               text: 'Ok'
-            }])
-         }else if(res.includes("medicao-menor")){
-            Alert.alert('', "Medição dada é menor que a ultima medição da casa.", [{
-               text: 'Ok'
-            }])
-         }else{
+         if(res.includes("ok")){
             Alert.alert('', "Medição enviada com sucesso", [{
                text: 'Ok',
                onPress: () => {
@@ -63,6 +59,19 @@ class List extends Component {
                   });
                }
             }])
+         }else if(res.includes("erro-login")){
+            Alert.alert('', "Algo deu errado, tente novamente.", [{
+               text: 'Ok'
+            }])
+         }else if(res.includes("medicao-menor")){
+            Alert.alert('', "Medição dada é menor que a ultima medição da casa.", [{
+               text: 'Ok'
+            }])
+         }else{
+            Alert.alert('', "Algum erro ocorreu.", [{
+               text: 'Ok'
+            }])
+            this.scanner.reactivate() 
          }
       })
       .catch(erro =>{
@@ -167,7 +176,7 @@ class List extends Component {
                   <TxtInputMedicao 
                      style={{marginTop: 10, width: '80%'}} 
                      placeholder="VALOR DA MEDIÇÃO"
-                     ref={(ref) => this.medicaoField = ref}
+                     onChangeText={(field) => this.setState({medicao: field})}
                      keyboardType="numeric"
                      type={'number'}
                   />

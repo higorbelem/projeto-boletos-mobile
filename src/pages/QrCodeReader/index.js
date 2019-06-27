@@ -35,7 +35,8 @@ class QRCodeReader extends Component {
       super(props)
 
       this.state = {
-         medidor: ''
+         medidor: '',
+         medicao: ''
       }
    
       this.getMedidor()
@@ -175,7 +176,7 @@ class QRCodeReader extends Component {
                         <TxtInputMedicao 
                            style={{marginTop: 10}} 
                            placeholder="VALOR DA MEDIÇÃO"
-                           ref={(ref) => this.medicaoField = ref}
+                           onChangeText={(field) => this.setState({medicao: field})}
                            keyboardType="numeric"
                            type={'number'}
                         />
@@ -225,7 +226,7 @@ class QRCodeReader extends Component {
 
    btnEnviarPress = (object) => {
       //console.warn(object.id)
-      const medicao = this.medicaoField._lastNativeText;
+      const medicao = this.state.medicao;
       if(medicao !== '' && medicao !== undefined){
          //console.warn(medicao)
          this.gerarMedicao(object.id, medicao)
@@ -244,7 +245,16 @@ class QRCodeReader extends Component {
          return res.text()
       })
       .then(res => {
-         if(res.includes("erro-login")){
+         if(res.includes("ok")){
+            Alert.alert('', "Medição enviada com sucesso", [{
+               text: 'Ok',
+               onPress: () => {
+                  DialogManager.dismissAll(() => {
+
+                  });
+               }
+            }])
+         }else if(res.includes("erro-login")){
             Alert.alert('', "Algo deu errado, tente novamente.", [{
                text: 'Ok'
             }])
@@ -255,14 +265,10 @@ class QRCodeReader extends Component {
             }])
             this.scanner.reactivate()  
          }else{
-            Alert.alert('', "Medição enviada com sucesso", [{
-               text: 'Ok',
-               onPress: () => {
-                  DialogManager.dismissAll(() => {
-
-                  });
-               }
+            Alert.alert('', "Algum erro ocorreu.", [{
+               text: 'Ok'
             }])
+            this.scanner.reactivate()  
          }
       })
       .catch(erro =>{
