@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {View, Text, AsyncStorage, Image} from 'react-native'
- 
+import NavigationService from '~/utils/NavigationService';
+
 class SplashScreen extends Component{
 
    constructor(props) {
@@ -9,9 +10,10 @@ class SplashScreen extends Component{
       setTimeout(() => {
          this.getMedidor().then(value => {
             if(value != null){
-               this.props.navigation.navigate('main')
+               //this.props.navigation.navigate('tabNav')
+               NavigationService.navigate('buscar')
             }else{
-               this.props.navigation.navigate('login')
+               NavigationService.navigate('login')
             }
          })
       }, 1000)

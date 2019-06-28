@@ -58,51 +58,6 @@ class Main extends Component{
 
     return (
       <Container>
-
-        <View style={{
-            width: '100%',
-            height: 40,
-            backgroundColor: '#00000080',
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}>
-
-          <Text style={{
-              position: 'absolute',
-              left: 10,
-              color: '#FFFFFFCC',
-              fontWeight: 'bold',
-              fontSize: 15
-            }}>
-              {
-                this.state.medidor.nome
-              }
-          </Text>
-
-          <BtnSair onPress={() => {
-            Alert.alert('', "Deseja sair?", [
-              {
-                text: 'Sim',
-                onPress: () => {
-                  this.storeData('').then(() =>{
-                    this.props.navigation.navigate('login')
-                  })
-                }
-              },
-              {
-                text: 'Não'
-              }
-            ])
-          }}>
-              <Text style={{
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: 15
-              }}>SAIR</Text>
-          </BtnSair>
-
-        </View>
-
         <ContainerBusca>
           <TxtInputLogin 
             editable={this.state.txtInputBuscaEditable} 
@@ -139,8 +94,8 @@ class Main extends Component{
           <View style={{
               flex: 1,
               width: '90%',
-              maxHeight: 60,
-              minHeight: 60,
+              maxHeight: 40,
+              minHeight: 40,
               flexDirection: 'row',
               marginTop: 5
             }}
@@ -160,8 +115,6 @@ class Main extends Component{
               style={{
                 flex:0.25, 
                 backgroundColor:'#00000010',
-                maxHeight: 60,
-                minHeight: 30,
                 width: '90%',
                 textAlign: 'center',
                 borderRadius: 40,
@@ -175,8 +128,8 @@ class Main extends Component{
           <View style={{
               flex: 1,
               width: '90%',
-              maxHeight: 60,
-              minHeight: 60,
+              maxHeight: 40,
+              minHeight: 40,
               flexDirection: 'row',
               marginTop: 5
             }}
@@ -196,8 +149,6 @@ class Main extends Component{
               style={{
                 flex:1, 
                 backgroundColor:'#00000010',
-                maxHeight: 60,
-                minHeight: 30,
                 width: '90%',
                 textAlign: 'center',
                 borderRadius: 40,
@@ -211,8 +162,8 @@ class Main extends Component{
           <View style={{
               flex: 1,
               width: '90%',
-              maxHeight: 60,
-              minHeight: 60,
+              maxHeight: 40,
+              minHeight: 40,
               flexDirection: 'row',
               marginTop: 5
             }}
@@ -232,8 +183,6 @@ class Main extends Component{
               style={{
                 flex:0.75, 
                 backgroundColor:'#00000010',
-                maxHeight: 60,
-                minHeight: 30,
                 width: '90%',
                 textAlign: 'center',
                 borderRadius: 40,
@@ -252,7 +201,7 @@ class Main extends Component{
 
         <ScrollView style={{width: '100%'}}>
           <List style={{width: '100%'}} 
-            items={this.state.items} 
+            items={[]} 
             ref={(ref) => this.listCasas = ref}/>
         </ScrollView>
 

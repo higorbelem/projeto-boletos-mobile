@@ -11,6 +11,8 @@ import { TextInputMask } from 'react-native-masked-text'
 import { accent1 } from '~/utils/Colors'
 import { ServerUrl } from '~/utils/server'
 import ApiUtils from '~/utils/ApiUtils'
+import NavigationService from '~/utils/NavigationService';
+
  
 class Login extends Component{
 
@@ -113,7 +115,8 @@ class Login extends Component{
                if(!res.includes("erro-login")){
                   this.storeData(res)
 
-                  this.props.navigation.navigate('main')
+                  //this.props.navigation.navigate('main')
+                  NavigationService.navigate('buscar')
                   this.setState({
                      loading: false
                   })

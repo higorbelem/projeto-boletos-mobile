@@ -8,7 +8,7 @@ export const Container = styled.View`
 
 export const ContainerBusca = styled.View`
    width: 100%;
-   height: 80px;
+   height: 60px;
    flex-direction: row;
    background-color: #00000005;
    justify-content: center;
@@ -17,7 +17,7 @@ export const ContainerBusca = styled.View`
 
 export const TxtInputLogin = styled.TextInput`
    width: 85%;
-   height: 50px;
+   height: 40px;
    align-items: center;
    text-align: center;
    padding: 10px;
