@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {View, Text, Alert, RefreshControl, ScrollView, AsyncStorage} from 'react-native'
 import List from './components/List'
 import { NavigationEvents } from "react-navigation";
-import { ServerUrl } from '~/utils/server'
+import { ServerUrl,ServerAuthPsw,ServerAuthUser } from '~/utils/server'
 import ApiUtils from '~/utils/ApiUtils'
   
 class Medicoes extends Component{
@@ -58,15 +58,15 @@ class Medicoes extends Component{
 
     buscarMedicoes = async () => {
         //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
-        await fetch(ServerUrl + '/projeto-boletos-server/getMedicoesMedidor.php', {method: 'POST', body: JSON.stringify({'medidor-id': this.state.medidor.id})})
+        await fetch(ServerUrl + '/projeto-boletos-server/getMedicoesMedidor.php', {method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw,'medidor-id': this.state.medidor.id})})
         .then(ApiUtils.checkStatus)
         .then(res => {
           return res.text()
         })
         .then(res => {
             //console.warn(res)
-            if(!res.includes("erro")){
-                object = JSON.parse(res);
+            if(res.split(';')[0].includes("ok")){
+                object = JSON.parse(res.trim().slice(3));
                 /*this.setState({
                 items: object
                 })*/

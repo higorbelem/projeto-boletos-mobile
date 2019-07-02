@@ -4,7 +4,7 @@ import { text1, text2, accent1 } from '~/utils/Colors'
 import DialogManager, { DialogContent } from 'react-native-dialog-component';
 import { SlideAnimation } from 'react-native-popup-dialog';
 import {TxtInputMedicao, BtnEnviar, BtnEnviarText} from '~/pages/QrCodeReader/styles'
-import { ServerUrl } from '~/utils/server'
+import { ServerUrl,ServerAuthPsw,ServerAuthUser } from '~/utils/server'
 import ApiUtils from '~/utils/ApiUtils'
 import moment from 'moment'; 
 import CompactItem from './CompactItem';
@@ -34,7 +34,7 @@ class List extends Component {
    excluirMedicao = (idMedicao) => {
       //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao}))
       
-      fetch(ServerUrl + '/projeto-boletos-server/deletaMedicao.php',{method: 'POST', body: JSON.stringify({'id-medicao': idMedicao})})
+      fetch(ServerUrl + '/projeto-boletos-server/deletaMedicao.php',{method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw, 'id-medicao': idMedicao})})
       .then(ApiUtils.checkStatus)
       .then(res => {
          return res.text()

@@ -3,7 +3,7 @@ import PopupDialog, { SlideAnimation } from 'react-native-popup-dialog';
 import DialogManager, { ScaleAnimation, DialogContent, Dialog, DialogButton, DialogComponent } from 'react-native-dialog-component';
 import { text1, text2, accent1 } from '~/utils/Colors'
 import {BtnEnviar, BtnEnviarText, TxtInputMedicao, BackBtn, BackBtnImage} from './styles'
-import { ServerUrl } from '~/utils/server'
+import { ServerUrl,ServerAuthPsw,ServerAuthUser } from '~/utils/server'
 import ApiUtils from '~/utils/ApiUtils'
  
 const slideAnimation = new SlideAnimation({
@@ -239,7 +239,7 @@ class QRCodeReader extends Component {
 
    gerarMedicao = (casaId, medicao) => {
       //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
-      fetch(ServerUrl + '/projeto-boletos-server/gerarMedicao.php',{method: 'POST', body: JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao})})
+      fetch(ServerUrl + '/projeto-boletos-server/gerarMedicao.php',{method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw,'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao})})
       .then(ApiUtils.checkStatus)
       .then(res => {
          return res.text()

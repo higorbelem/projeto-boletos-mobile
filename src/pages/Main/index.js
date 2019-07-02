@@ -7,7 +7,7 @@ import List from './components/List';
 //import AbortController from 'abort-controller'
 import 'abort-controller/polyfill'
 //import 'abortcontroller-polyfill'
-import { ServerUrl } from '~/utils/server'
+import { ServerUrl,ServerAuthPsw,ServerAuthUser } from '~/utils/server'
 import ApiUtils from '~/utils/ApiUtils'
 
 const AbortController = window.AbortController;
@@ -325,14 +325,14 @@ class Main extends Component{
 
   buscarCasasSimples = async (busca) => {
     //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
-    await fetch(ServerUrl + '/projeto-boletos-server/buscarCasasSimples.php', {method: 'POST', body: JSON.stringify({'id-cedente': this.state.medidor.cedenteId, 'busca': busca})},{signal})
+    await fetch(ServerUrl + '/projeto-boletos-server/buscarCasasSimples.php', {method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw, 'id-cedente': this.state.medidor.cedenteId, 'busca': busca})},{signal})
     .then(ApiUtils.checkStatus)
     .then(res => {
       return res.text()
     })
     .then(res => {
-      if(!res.includes("erro-login")){
-        object = JSON.parse(res);
+      if(res.split(';')[0].includes("ok")){
+        object = JSON.parse(res.trim().slice(3));
         /*Alert.alert('Error', object[0].id, [{
           text: 'Ok'
         }])*/
@@ -365,6 +365,8 @@ class Main extends Component{
     //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
     await fetch(ServerUrl + '/projeto-boletos-server/buscarCasasAvancado.php', 
       {method: 'POST', body: JSON.stringify({
+        "auth-usr": ServerAuthUser, 
+        "auth-psw": ServerAuthPsw,
         'id-cedente': this.state.medidor.cedenteId,
         'rua': rua,
         'numero': numero,
@@ -383,8 +385,8 @@ class Main extends Component{
       /*Alert.alert('Error', res, [{
         text: 'Ok'
       }])*/
-      if(!res.includes("erro-login")){
-        object = JSON.parse(res);
+      if(res.split(';')[0].includes("ok")){
+        object = JSON.parse(res.trim().slice(3));
         this.listCasas.updateItems(object, this.state.medidor)
         this.setState({
           loading: false

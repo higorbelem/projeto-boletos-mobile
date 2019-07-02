@@ -9,7 +9,7 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import { TextInputMask } from 'react-native-masked-text'
 import { accent1 } from '~/utils/Colors'
-import { ServerUrl } from '~/utils/server'
+import { ServerUrl,ServerAuthPsw,ServerAuthUser } from '~/utils/server'
 import ApiUtils from '~/utils/ApiUtils'
 import NavigationService from '~/utils/NavigationService';
 
@@ -105,15 +105,15 @@ class Login extends Component{
                loading: true
             })
             this.buttonClicked = true
-            fetch(ServerUrl + '/projeto-boletos-server/getMedidor.php',{method: 'POST', body: JSON.stringify({cpf: cpf, senha: senha})})
+            fetch(ServerUrl + '/projeto-boletos-server/getMedidor.php',{method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw, cpf: cpf, senha: senha})})
             .then(ApiUtils.checkStatus)
             .then(res => {
                return res.text()
             })
             .then(res => {
                this.buttonClicked = false
-               if(!res.includes("erro-login")){
-                  this.storeData(res)
+               if(res.split(';')[0].includes("ok")){
+                  this.storeData(res.trim().slice(3))
 
                   //this.props.navigation.navigate('main')
                   NavigationService.navigate('buscar')
