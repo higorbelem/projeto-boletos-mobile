@@ -103,7 +103,9 @@ class List extends Component {
                         ID
                      </Text>
                      <Text style={{color: text2, marginLeft: 10}}>
-                        {item.id}
+                        {
+                           item.id
+                        }
                      </Text>
                   </View>
                   <View 
@@ -232,8 +234,12 @@ class List extends Component {
                               alignContent: 'center',
                               flex:0.15
                            }}>
-                              <Text style={{color: accent1, fontSize: 35, fontWeight: 'bold', textAlign: 'center'}}>
-                                 {item.id}
+                              <Text
+                                 style={{color: accent1, fontSize: 35, fontWeight: 'bold', textAlign: 'center'}}>
+                                    {
+                                       item.id
+                                       //"1000"
+                                    }
                               </Text>
                               <Text style={{color: text1, fontSize: 15, fontWeight: 'bold', textAlign: 'center'}}>
                                  ID

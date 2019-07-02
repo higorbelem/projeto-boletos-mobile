@@ -40,6 +40,7 @@ class Medicoes extends Component{
                     }}
                 />
                 <List style={{width: '100%'}} 
+                    parent={this}
                     items={[]} 
                     ref={(ref) => this.listMedicoes = ref}/>
            </ScrollView>
