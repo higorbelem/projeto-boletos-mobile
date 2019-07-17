@@ -229,7 +229,7 @@ class QRCodeReader extends Component {
       const medicao = this.state.medicao;
       if(medicao !== '' && medicao !== undefined){
          //console.warn(medicao)
-         this.gerarMedicao(object.id, medicao)
+         this.gerarMedicao(object.id, medicao, false)
       }else{
          Alert.alert('', "Campo vazio", [{
             text: 'Ok'
@@ -237,9 +237,9 @@ class QRCodeReader extends Component {
       }
    }
 
-   gerarMedicao = (casaId, medicao) => {
+   gerarMedicao = (casaId, medicao, medidorReiniciou) => {
       //console.warn(JSON.stringify({'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': '89'}))
-      fetch(ServerUrl + '/projeto-boletos-server/gerarMedicao.php',{method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw,'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao})})
+      fetch(ServerUrl + '/projeto-boletos-server/gerarMedicao.php',{method: 'POST', body: JSON.stringify({"auth-usr": ServerAuthUser, "auth-psw": ServerAuthPsw, 'casa-id': casaId, 'medidor-id': this.state.medidor.id, 'medicao': medicao, 'medidor-reiniciou': medidorReiniciou})})
       .then(ApiUtils.checkStatus)
       .then(res => {
          return res.text()
@@ -260,10 +260,17 @@ class QRCodeReader extends Component {
             }])
             this.scanner.reactivate()  
          }else if(res.includes("medicao-menor")){
-            Alert.alert('', "Medição dada é menor que a ultima medição da casa.", [{
-               text: 'Ok'
-            }])
-            this.scanner.reactivate()  
+            Alert.alert('', "Medição dada é menor que a ultima medição da casa.\nO medidor reiniciou?", [
+               {
+                  text: 'Sim',
+                  onPress: () => {
+                     this.gerarMedicao(casaId, medicao, true)
+                  }
+               },
+               {
+                  text: 'Não'
+               }
+            ])
          }else{
             Alert.alert('', "Algum erro ocorreu.", [{
                text: 'Ok'

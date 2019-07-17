@@ -243,7 +243,7 @@ class List extends Component {
       if(this.state.items.length === 0){
          return(
             <Text style={{textAlign: 'center', padding: 30, fontSize: 15}}>
-               Busque por rua, número, bairro, cidade, UF, CEP, nome ou documento do proprietário.
+               Carregando...
             </Text>
          )
       }
